@@ -1,0 +1,1673 @@
+```html
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<title>FormWheel Vault</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  min-height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f7f8fc;
+  color:#17181c;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid #e8e9ee;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  text-decoration:none;
+  color:#17181c;
+  font-size:21px;
+  font-weight:900;
+}
+.logo-icon{
+  width:35px;
+  height:35px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  background:#17181c;
+  color:white;
+  font-size:19px;
+}
+.logo span{letter-spacing:-.7px}
+
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.coin{
+  padding:8px 13px;
+  background:#fff;
+  border:1px solid #e3e4e9;
+  border-radius:999px;
+  font-weight:800;
+}
+
+main{
+  width:min(1080px,calc(100% - 28px));
+  margin:0 auto;
+  padding:35px 0 70px;
+}
+
+.screen{display:none}
+.screen.active{display:block}
+
+.hero{
+  text-align:center;
+  padding:22px 0 30px;
+}
+.hero h1{
+  margin:0;
+  font-size:46px;
+  letter-spacing:-2.5px;
+}
+.hero p{
+  color:#737681;
+  margin:10px 0 0;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e4e5ea;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 8px 30px rgba(0,0,0,.035);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+@media(max-width:700px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:36px}
+}
+
+.card h2{
+  margin:0 0 7px;
+  font-size:21px;
+}
+.card p{
+  color:#737681;
+  margin:0;
+}
+
+.big-vault{
+  min-height:220px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(255,215,80,.18),transparent 40%),
+    #fff;
+}
+
+.vault-icon{
+  font-size:76px;
+  margin-bottom:10px;
+}
+
+.vault-level{
+  font-size:13px;
+  color:#777b85;
+  font-weight:800;
+}
+
+.vault-money{
+  font-size:38px;
+  font-weight:950;
+  margin-top:3px;
+}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+@media(max-width:650px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+.stat{
+  padding:15px;
+  border:1px solid #e7e8ec;
+  border-radius:15px;
+  background:#fafafd;
+}
+.stat b{
+  display:block;
+  font-size:20px;
+}
+.stat span{
+  font-size:12px;
+  color:#777b85;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:17px;
+}
+
+.btn{
+  border:0;
+  border-radius:13px;
+  padding:12px 17px;
+  font-weight:850;
+  transition:.15s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:#17181c;color:white}
+.btn-light{background:#f0f1f5;color:#202126}
+.btn-green{background:#e5f8eb;color:#137333}
+.btn-red{background:#fff0f0;color:#b42318}
+.btn-gold{background:#fff5cf;color:#7a5a00}
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:28px 0 12px;
+}
+.section-title h2{margin:0}
+
+.input{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #dfe1e7;
+  border-radius:12px;
+  outline:none;
+  background:white;
+}
+.input:focus{border-color:#555}
+
+.form-row{
+  display:flex;
+  gap:10px;
+}
+.form-row>*{flex:1}
+
+.vault-slots{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+@media(max-width:650px){
+  .vault-slots{grid-template-columns:repeat(2,1fr)}
+}
+
+.slot{
+  min-height:105px;
+  border:1px solid #e5e6eb;
+  border-radius:15px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  background:#fafafd;
+}
+.slot-icon{font-size:30px}
+.slot-name{
+  font-weight:800;
+  font-size:13px;
+  margin-top:4px;
+}
+.slot-rarity{
+  font-size:11px;
+  color:#888b93;
+}
+
+.players{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+@media(max-width:600px){
+  .players{grid-template-columns:1fr}
+}
+
+.player{
+  padding:14px;
+  border:1px solid #e5e6eb;
+  border-radius:14px;
+  background:#fafafd;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.player-name{font-weight:850}
+.player-score{font-weight:900}
+
+.vaults{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+@media(max-width:750px){
+  .vaults{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .vaults{grid-template-columns:1fr}
+}
+
+.public-vault{
+  min-height:185px;
+  padding:18px;
+  border:1px solid #e2e3e8;
+  border-radius:18px;
+  background:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+}
+.public-vault.locked{
+  background:linear-gradient(145deg,#fff,#f4f5f8);
+}
+.public-vault.special{
+  background:linear-gradient(145deg,#fff9dc,#fff);
+}
+.public-vault h3{
+  margin:0;
+}
+.public-vault .lock{
+  font-size:43px;
+  text-align:center;
+  padding:5px 0;
+}
+.public-vault small{
+  color:#7b7e87;
+}
+
+.badge{
+  display:inline-flex;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:850;
+  background:#f0f1f5;
+}
+
+.room-code{
+  font-size:32px;
+  font-weight:950;
+  letter-spacing:6px;
+  text-align:center;
+  padding:18px;
+  background:#fafafd;
+  border-radius:16px;
+  margin:15px 0;
+}
+
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.42);
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.modal-bg.show{display:flex}
+
+.modal{
+  width:min(500px,100%);
+  background:white;
+  border-radius:24px;
+  padding:25px;
+  box-shadow:0 20px 70px rgba(0,0,0,.18);
+}
+.modal h2{margin:0 0 10px}
+.modal p{color:#747781}
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+.modal-actions button{flex:1}
+
+.event{
+  text-align:center;
+  padding:22px 10px;
+}
+.event-icon{font-size:65px}
+.event-title{
+  font-size:28px;
+  font-weight:950;
+  margin:8px 0;
+}
+.event-result{
+  font-size:20px;
+  font-weight:850;
+}
+
+.progress{
+  height:9px;
+  background:#eceef2;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.progress i{
+  display:block;
+  height:100%;
+  background:#17181c;
+  width:0%;
+}
+
+.notice{
+  padding:13px 15px;
+  background:#f5f6f9;
+  border-radius:13px;
+  color:#666a73;
+  font-size:13px;
+  margin-top:13px;
+}
+
+.hidden{display:none!important}
+.center{text-align:center}
+.muted{color:#777b85}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <a class="logo" href="https://semicolonxss.github.io/Formwheel/">
+    <div class="logo-icon">🔐</div>
+    <span>FormWheel Vault</span>
+  </a>
+
+  <div class="header-right">
+    <div class="coin">💰 <span id="topMoney">0</span></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section id="homeScreen" class="screen active">
+
+    <div class="hero">
+      <h1>🔐 Vault</h1>
+      <p>공용 금고를 탐험하고, 얻은 보물을 나의 금고에 보관하세요.</p>
+    </div>
+
+    <div class="grid">
+
+      <div class="card big-vault">
+        <div class="vault-icon">🔐</div>
+        <div class="vault-level" id="homeVaultLevel">VAULT LEVEL 1</div>
+        <div class="vault-money">
+          💰 <span id="homeVaultMoney">0</span>
+        </div>
+        <div class="muted">나의 금고</div>
+
+        <div class="actions">
+          <button class="btn btn-dark" onclick="showScreen('myVaultScreen')">
+            나의 금고 열기
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🌐 공용 금고</h2>
+        <p>위험을 감수하고 더 큰 보상을 찾아보세요.</p>
+
+        <div class="stat-grid">
+          <div class="stat">
+            <b id="homeKeys">0</b>
+            <span>🔑 열쇠</span>
+          </div>
+          <div class="stat">
+            <b id="homeTreasures">0</b>
+            <span>💎 보물</span>
+          </div>
+          <div class="stat">
+            <b id="homeDefense">1</b>
+            <span>🛡️ 방어</span>
+          </div>
+          <div class="stat">
+            <b id="homeGames">0</b>
+            <span>🎮 플레이</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-dark" onclick="showScreen('roomScreen')">
+            게임 시작
+          </button>
+          <button class="btn btn-light" onclick="showScreen('myVaultScreen')">
+            나의 금고
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">
+      <h2>💎 나의 보물</h2>
+    </div>
+
+    <div class="card">
+      <div class="vault-slots" id="homeTreasuresGrid"></div>
+    </div>
+
+  </section>
+
+
+  <!-- ROOM -->
+  <section id="roomScreen" class="screen">
+
+    <div class="hero">
+      <h1>🌐 Vault Room</h1>
+      <p>친구와 방을 만들거나 방 코드로 참가하세요.</p>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <h2>방 만들기</h2>
+        <p>새로운 Vault 게임을 시작합니다.</p>
+
+        <div style="margin-top:16px">
+          <input id="hostName" class="input" maxlength="12"
+                 placeholder="닉네임 (최대 12자)">
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-dark" onclick="createRoom()">
+            방 만들기
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>방 참가하기</h2>
+        <p>친구에게 받은 4자리 방 코드로 참가하세요.</p>
+
+        <div style="margin-top:16px">
+          <input id="joinName" class="input" maxlength="12"
+                 placeholder="닉네임 (최대 12자)">
+        </div>
+
+        <div style="margin-top:10px">
+          <input id="joinCode" class="input" maxlength="4"
+                 inputmode="numeric"
+                 placeholder="방 코드 4자리">
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-dark" onclick="joinRoom()">
+            참가하기
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-light" onclick="showScreen('homeScreen')">
+        ← 돌아가기
+      </button>
+    </div>
+
+  </section>
+
+
+  <!-- LOBBY -->
+  <section id="lobbyScreen" class="screen">
+
+    <div class="hero">
+      <h1>🔐 Vault Lobby</h1>
+      <p>플레이어가 모이면 게임을 시작하세요.</p>
+    </div>
+
+    <div class="card center">
+
+      <div class="muted">ROOM CODE</div>
+      <div class="room-code" id="lobbyCode">----</div>
+
+      <button class="btn btn-light" onclick="copyRoomCode()">
+        코드 복사
+      </button>
+
+      <div class="section-title">
+        <h2>플레이어</h2>
+        <span class="badge" id="playerCount">0 / 6</span>
+      </div>
+
+      <div class="players" id="playersList"></div>
+
+      <div class="notice">
+        각 플레이어는 게임 중 자신의 금고를 가지고 있습니다.
+      </div>
+
+      <div class="actions" style="justify-content:center">
+        <button id="startGameBtn" class="btn btn-dark" onclick="startGame()">
+          게임 시작
+        </button>
+
+        <button class="btn btn-light" onclick="leaveRoom()">
+          나가기
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- GAME -->
+  <section id="gameScreen" class="screen">
+
+    <div class="hero">
+      <h1>🌐 Vault Run</h1>
+      <p>금고를 선택하고, 보상을 챙긴 뒤 언제 탈출할지 결정하세요.</p>
+    </div>
+
+    <div class="card">
+
+      <div class="stat-grid">
+        <div class="stat">
+          <b id="gameScore">0</b>
+          <span>💰 현재 점수</span>
+        </div>
+        <div class="stat">
+          <b id="gameRound">1</b>
+          <span>🔄 라운드</span>
+        </div>
+        <div class="stat">
+          <b id="gameKeys">0</b>
+          <span>🔑 열쇠</span>
+        </div>
+        <div class="stat">
+          <b id="gameBank">0</b>
+          <span>🔐 보관 점수</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">
+      <h2>🔐 공용 금고</h2>
+      <span class="badge">하나를 선택하세요</span>
+    </div>
+
+    <div class="vaults" id="publicVaults"></div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>🏃 탈출</h2>
+      <p>현재 점수를 나의 금고에 보관하고 게임에서 탈출합니다.</p>
+
+      <div class="actions">
+        <button class="btn btn-gold" onclick="escapeGame()">
+          🚪 탈출하고 보관
+        </button>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <h2>👥 플레이어</h2>
+    </div>
+
+    <div class="card">
+      <div class="players" id="gamePlayers"></div>
+    </div>
+
+  </section>
+
+
+  <!-- MY VAULT -->
+  <section id="myVaultScreen" class="screen">
+
+    <div class="hero">
+      <h1>🏠 나의 금고</h1>
+      <p>게임에서 얻은 보상과 보물을 안전하게 관리하세요.</p>
+    </div>
+
+    <div class="card big-vault">
+
+      <div class="vault-icon">🔐</div>
+
+      <div class="vault-level" id="myVaultLevel">
+        VAULT LEVEL 1
+      </div>
+
+      <div class="vault-money">
+        💰 <span id="myVaultMoney">0</span>
+      </div>
+
+      <div class="muted">보관된 점수</div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <b id="myKeys">0</b>
+          <span>🔑 열쇠</span>
+        </div>
+
+        <div class="stat">
+          <b id="myDefense">1</b>
+          <span>🛡️ 방어</span>
+        </div>
+
+        <div class="stat">
+          <b id="myTreasures">0</b>
+          <span>💎 보물</span>
+        </div>
+
+        <div class="stat">
+          <b id="myGames">0</b>
+          <span>🎮 플레이</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">
+      <h2>📈 금고 성장</h2>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between">
+        <b>다음 레벨</b>
+        <span id="xpText">0 / 100 XP</span>
+      </div>
+
+      <div class="progress">
+        <i id="xpBar"></i>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-dark" onclick="upgradeVault()">
+          ⬆️ 금고 업그레이드
+        </button>
+      </div>
+
+      <div class="notice">
+        금고 레벨이 올라갈수록 보관 슬롯과 방어 능력이 증가합니다.
+      </div>
+    </div>
+
+    <div class="section-title">
+      <h2>💎 보물 컬렉션</h2>
+    </div>
+
+    <div class="card">
+      <div class="vault-slots" id="treasureGrid"></div>
+    </div>
+
+    <div class="section-title">
+      <h2>🎒 보유 아이템</h2>
+    </div>
+
+    <div class="card">
+      <div class="stat-grid">
+        <div class="stat">
+          <b id="itemKeys">0</b>
+          <span>🔑 열쇠</span>
+        </div>
+        <div class="stat">
+          <b id="itemDefense">1</b>
+          <span>🛡️ 방어막</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-light" onclick="showScreen('homeScreen')">
+        ← 홈으로
+      </button>
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- EVENT MODAL -->
+<div class="modal-bg" id="eventModal">
+  <div class="modal">
+
+    <div class="event">
+      <div class="event-icon" id="eventIcon">🔐</div>
+      <div class="event-title" id="eventTitle">Vault</div>
+      <div class="event-result" id="eventResult">...</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-light" onclick="closeEvent()">
+        확인
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal">
+    <h2 id="confirmTitle">확인</h2>
+    <p id="confirmText"></p>
+
+    <div class="modal-actions">
+      <button class="btn btn-light" onclick="closeConfirm()">
+        취소
+      </button>
+      <button class="btn btn-dark" id="confirmButton">
+        확인
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  set,
+  update,
+  get,
+  onValue,
+  remove,
+  push
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBreTSe1m0-xlbF4aupnU5isRZCihR25IE",
+  authDomain: "formwheel.firebaseapp.com",
+  databaseURL: "https://formwheel-default-rtdb.firebaseio.com",
+  projectId: "formwheel",
+  storageBucket: "formwheel.firebasestorage.app",
+  messagingSenderId: "431583088241",
+  appId: "1:431583088241:web:74e0e34ea1e3e1170c55d0",
+  measurementId: "G-T372YXDF8D"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+
+/* =========================================================
+   LOCAL VAULT
+========================================================= */
+
+const SAVE_KEY = "formwheel_vault_save_v1";
+
+const treasureList = [
+  {id:"silver",icon:"🪙",name:"은화",rarity:"일반"},
+  {id:"emerald",icon:"💚",name:"에메랄드",rarity:"희귀"},
+  {id:"sapphire",icon:"💎",name:"사파이어",rarity:"영웅"},
+  {id:"crown",icon:"👑",name:"황금 왕관",rarity:"전설"},
+  {id:"crystal",icon:"🔮",name:"신비한 수정",rarity:"전설"},
+  {id:"ring",icon:"💍",name:"왕의 반지",rarity:"영웅"},
+  {id:"idol",icon:"🗿",name:"고대 우상",rarity:"희귀"},
+  {id:"star",icon:"🌟",name:"별의 보물",rarity:"신화"}
+];
+
+let vault = loadVault();
+
+function defaultVault(){
+  return {
+    money:0,
+    level:1,
+    xp:0,
+    keys:0,
+    defense:1,
+    games:0,
+    treasures:[],
+    totalEarned:0
+  };
+}
+
+function loadVault(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(SAVE_KEY));
+    return {...defaultVault(),...(saved||{})};
+  }catch(e){
+    return defaultVault();
+  }
+}
+
+function saveVault(){
+  localStorage.setItem(SAVE_KEY,JSON.stringify(vault));
+  updateUI();
+}
+
+window.resetLocalVault=()=>{
+  vault=defaultVault();
+  saveVault();
+};
+
+
+/* =========================================================
+   SCREEN
+========================================================= */
+
+window.showScreen=function(id){
+  document.querySelectorAll(".screen")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.getElementById(id)?.classList.add("active");
+
+  if(id==="myVaultScreen") updateUI();
+};
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function updateUI(){
+
+  document.getElementById("topMoney").textContent =
+    vault.money.toLocaleString();
+
+  document.getElementById("homeVaultMoney").textContent =
+    vault.money.toLocaleString();
+
+  document.getElementById("homeVaultLevel").textContent =
+    "VAULT LEVEL "+vault.level;
+
+  document.getElementById("homeKeys").textContent=vault.keys;
+  document.getElementById("homeTreasures").textContent=vault.treasures.length;
+  document.getElementById("homeDefense").textContent=vault.defense;
+  document.getElementById("homeGames").textContent=vault.games;
+
+  document.getElementById("myVaultMoney").textContent=
+    vault.money.toLocaleString();
+
+  document.getElementById("myVaultLevel").textContent=
+    "VAULT LEVEL "+vault.level;
+
+  document.getElementById("myKeys").textContent=vault.keys;
+  document.getElementById("myDefense").textContent=vault.defense;
+  document.getElementById("myTreasures").textContent=vault.treasures.length;
+  document.getElementById("myGames").textContent=vault.games;
+
+  document.getElementById("itemKeys").textContent=vault.keys;
+  document.getElementById("itemDefense").textContent=vault.defense;
+
+  const need=vault.level*100;
+  document.getElementById("xpText").textContent=
+    `${vault.xp} / ${need} XP`;
+
+  document.getElementById("xpBar").style.width=
+    Math.min(100,vault.xp/need*100)+"%";
+
+  renderTreasures("treasureGrid");
+  renderTreasures("homeTreasuresGrid");
+}
+
+function renderTreasures(id){
+
+  const el=document.getElementById(id);
+  if(!el)return;
+
+  el.innerHTML="";
+
+  treasureList.forEach(t=>{
+
+    const owned=vault.treasures.includes(t.id);
+
+    const div=document.createElement("div");
+    div.className="slot";
+
+    div.innerHTML=`
+      <div class="slot-icon">${owned?t.icon:"❔"}</div>
+      <div class="slot-name">${owned?t.name:"미발견"}</div>
+      <div class="slot-rarity">${owned?t.rarity:"???"}</div>
+    `;
+
+    el.appendChild(div);
+  });
+}
+
+updateUI();
+
+
+/* =========================================================
+   ROOM STATE
+========================================================= */
+
+let roomCode=null;
+let playerId=
+  localStorage.getItem("formwheel_vault_player_id");
+
+if(!playerId){
+  playerId="p_"+Math.random().toString(36).slice(2,10);
+  localStorage.setItem("formwheel_vault_player_id",playerId);
+}
+
+let playerName="";
+let isHost=false;
+let roomListener=null;
+
+let gameState={
+  score:0,
+  round:1,
+  bank:0,
+  keys:0,
+  active:true
+};
+
+
+/* =========================================================
+   ROOM
+========================================================= */
+
+function randomCode(){
+  return String(Math.floor(1000+Math.random()*9000));
+}
+
+window.createRoom=async function(){
+
+  const name=
+    document.getElementById("hostName").value.trim();
+
+  if(!name){
+    alert("닉네임을 입력해주세요.");
+    return;
+  }
+
+  playerName=name.slice(0,12);
+
+  let code=randomCode();
+
+  const roomRef=ref(db,"vaultRooms/"+code);
+
+  while((await get(roomRef)).exists()){
+    code=randomCode();
+  }
+
+  roomCode=code;
+  isHost=true;
+
+  await set(roomRef,{
+    status:"lobby",
+    round:0,
+    host:playerId,
+    players:{
+      [playerId]:{
+        name:playerName,
+        score:0,
+        bank:0,
+        active:true
+      }
+    }
+  });
+
+  enterLobby();
+};
+
+
+window.joinRoom=async function(){
+
+  const name=
+    document.getElementById("joinName").value.trim();
+
+  const code=
+    document.getElementById("joinCode").value.trim();
+
+  if(!name){
+    alert("닉네임을 입력해주세요.");
+    return;
+  }
+
+  if(!/^\d{4}$/.test(code)){
+    alert("4자리 방 코드를 입력해주세요.");
+    return;
+  }
+
+  const roomRef=ref(db,"vaultRooms/"+code);
+  const snap=await get(roomRef);
+
+  if(!snap.exists()){
+    alert("존재하지 않는 방입니다.");
+    return;
+  }
+
+  const data=snap.val();
+
+  if(data.status!=="lobby"){
+    alert("이미 게임이 시작된 방입니다.");
+    return;
+  }
+
+  const count=
+    data.players?Object.keys(data.players).length:0;
+
+  if(count>=6){
+    alert("방이 가득 찼습니다.");
+    return;
+  }
+
+  playerName=name.slice(0,12);
+  roomCode=code;
+  isHost=false;
+
+  await update(
+    ref(db,`vaultRooms/${code}/players/${playerId}`),
+    {
+      name:playerName,
+      score:0,
+      bank:0,
+      active:true
+    }
+  );
+
+  enterLobby();
+};
+
+
+function enterLobby(){
+
+  document.getElementById("lobbyCode").textContent=roomCode;
+
+  showScreen("lobbyScreen");
+
+  if(roomListener) roomListener();
+
+  roomListener=onValue(
+    ref(db,"vaultRooms/"+roomCode),
+    snap=>{
+      if(!snap.exists()){
+        alert("방이 종료되었습니다.");
+        showScreen("roomScreen");
+        return;
+      }
+
+      const data=snap.val();
+
+      renderPlayers(data.players||{});
+
+      if(data.status==="game"){
+        loadGame(data);
+      }
+    }
+  );
+}
+
+
+function renderPlayers(players){
+
+  const list=
+    document.getElementById("playersList");
+
+  const gameList=
+    document.getElementById("gamePlayers");
+
+  const entries=
+    Object.entries(players);
+
+  document.getElementById("playerCount")
+    .textContent=`${entries.length} / 6`;
+
+  list.innerHTML="";
+  gameList.innerHTML="";
+
+  entries.forEach(([id,p])=>{
+
+    const div=document.createElement("div");
+    div.className="player";
+
+    div.innerHTML=`
+      <span class="player-name">
+        ${escapeHtml(p.name)}
+        ${id===playerId?" (나)":""}
+        ${id===dataHost()?" 👑":""}
+      </span>
+      <span class="player-score">
+        ${Number(p.score||0)} P
+      </span>
+    `;
+
+    list.appendChild(div);
+
+    const gameDiv=div.cloneNode(true);
+    gameList.appendChild(gameDiv);
+  });
+
+  document.getElementById("startGameBtn").style.display=
+    isHost?"inline-block":"none";
+}
+
+function dataHost(){
+  return window.__vaultHost||"";
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+window.startGame=async function(){
+
+  if(!isHost)return;
+
+  const snap=
+    await get(ref(db,"vaultRooms/"+roomCode));
+
+  const data=snap.val();
+
+  const players=
+    Object.keys(data.players||{});
+
+  if(players.length<2){
+    alert("최소 2명이 필요합니다.");
+    return;
+  }
+
+  await update(
+    ref(db,"vaultRooms/"+roomCode),
+    {
+      status:"game",
+      round:1,
+      vaults:createVaults()
+    }
+  );
+};
+
+
+function createVaults(){
+
+  return [
+    makeVault(1),
+    makeVault(2),
+    makeVault(3),
+    makeVault(4),
+    makeVault(5),
+    makeVault(6)
+  ];
+}
+
+function makeVault(id){
+
+  const r=Math.random();
+
+  let type="coin";
+
+  if(r<.17)type="trap";
+  else if(r<.30)type="key";
+  else if(r<.42)type="treasure";
+  else if(r<.52)type="double";
+  else if(r<.59)type="shield";
+
+  return {
+    id,
+    type,
+    openedBy:null,
+    value:
+      type==="coin" ? rand(15,55):
+      type==="trap" ? rand(15,45):
+      type==="key" ? 0:
+      type==="treasure" ? rand(25,70):
+      type==="double" ? rand(30,60):
+      0
+  };
+}
+
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+
+/* =========================================================
+   GAME
+========================================================= */
+
+function loadGame(data){
+
+  window.__vaultHost=data.host;
+
+  if(data.host===playerId){
+    isHost=true;
+  }
+
+  const me=data.players?.[playerId];
+
+  if(!me)return;
+
+  gameState.score=Number(me.score||0);
+  gameState.bank=Number(me.bank||0);
+  gameState.round=Number(data.round||1);
+  gameState.keys=vault.keys;
+
+  document.getElementById("gameScore").textContent=
+    gameState.score;
+
+  document.getElementById("gameRound").textContent=
+    gameState.round;
+
+  document.getElementById("gameKeys").textContent=
+    gameState.keys;
+
+  document.getElementById("gameBank").textContent=
+    gameState.bank;
+
+  renderPublicVaults(data.vaults||[]);
+  renderPlayers(data.players||{});
+
+  showScreen("gameScreen");
+}
+
+
+function renderPublicVaults(vaults){
+
+  const el=
+    document.getElementById("publicVaults");
+
+  el.innerHTML="";
+
+  vaults.forEach(v=>{
+
+    const opened=!!v.openedBy;
+
+    const div=document.createElement("div");
+
+    div.className=
+      "public-vault "+
+      (v.type==="double"?"special":"")+
+      (opened?" opened":"");
+
+    if(opened){
+
+      div.innerHTML=`
+        <span class="badge">OPENED</span>
+        <div class="lock">📭</div>
+        <h3>이미 열린 금고</h3>
+        <small>다른 플레이어가 먼저 가져갔습니다.</small>
+      `;
+
+    }else{
+
+      div.innerHTML=`
+        <span class="badge">VAULT ${v.id}</span>
+        <div class="lock">🔐</div>
+        <h3>${vaultName(v.type)}</h3>
+        <small>${vaultHint(v.type)}</small>
+
+        <div class="actions">
+          <button class="btn btn-dark"
+            onclick="openPublicVault(${v.id})">
+            열기
+          </button>
+        </div>
+      `;
+    }
+
+    el.appendChild(div);
+  });
+}
+
+
+function vaultName(type){
+
+  return {
+    coin:"💰 보물 금고",
+    trap:"☠️ 함정 금고",
+    key:"🔑 열쇠 금고",
+    treasure:"💎 보물 금고",
+    double:"🎲 더블 금고",
+    shield:"🛡️ 방어 금고"
+  }[type]||"🔐 미지의 금고";
+}
+
+function vaultHint(type){
+
+  return {
+    coin:"안정적인 점수",
+    trap:"높은 위험",
+    key:"열쇠를 발견할 수도 있습니다",
+    treasure:"희귀한 보물",
+    double:"성공하면 보상이 커집니다",
+    shield:"금고 방어 아이템"
+  }[type]||"";
+}
+
+
+/* =========================================================
+   OPEN VAULT
+========================================================= */
+
+window.openPublicVault=async function(id){
+
+  if(!roomCode || !gameState.active)return;
+
+  const roomRef=
+    ref(db,"vaultRooms/"+roomCode);
+
+  const snap=await get(roomRef);
+
+  if(!snap.exists())return;
+
+  const data=snap.val();
+
+  if(data.status!=="game")return;
+
+  const vaults=data.vaults||[];
+
+  const target=
+    vaults.find(v=>Number(v.id)===Number(id));
+
+  if(!target || target.openedBy){
+    return;
+  }
+
+  target.openedBy=playerId;
+
+  await update(
+    roomRef,
+    {vaults}
+  );
+
+  await resolveVault(target);
+};
+
+
+async function resolveVault(v){
+
+  let score=gameState.score;
+  let result="";
+  let icon="🔐";
+
+  if(v.type==="coin"){
+
+    score+=v.value;
+    result=`+${v.value} 포인트를 획득했습니다!`;
+    icon="💰";
+
+  }else if(v.type==="trap"){
+
+    score-=v.value;
+    result=`-${v.value} 포인트! 함정에 걸렸습니다.`;
+    icon="☠️";
+
+  }else if(v.type==="key"){
+
+    vault.keys++;
+    result="🔑 열쇠 1개를 획득했습니다!";
+    icon="🔑";
+
+  }else if(v.type==="treasure"){
+
+    score+=v.value;
+
+    const t=
+      treasureList[
+        Math.floor(Math.random()*treasureList.length)
+      ];
+
+    if(!vault.treasures.includes(t.id)){
+      vault.treasures.push(t.id);
+    }
+
+    result=
+      `+${v.value}점 + ${t.icon} ${t.name} 발견!`;
+
+    icon="💎";
+
+  }else if(v.type==="double"){
+
+    if(Math.random()<.5){
+
+      score+=v.value*2;
+      result=`🎉 성공! +${v.value*2} 포인트!`;
+      icon="🎲";
+
+    }else{
+
+      score-=v.value;
+      result=`실패! -${v.value} 포인트.`;
+      icon="💥";
+    }
+
+  }else if(v.type==="shield"){
+
+    vault.defense++;
+    result="🛡️ 금고 방어막 1개를 획득했습니다!";
+    icon="🛡️";
+  }
+
+  gameState.score=score;
+  gameState.keys=vault.keys;
+
+  await update(
+    ref(db,`vaultRooms/${roomCode}/players/${playerId}`),
+    {
+      score,
+      bank:gameState.bank,
+      active:true
+    }
+  );
+
+  saveVault();
+
+  showEvent(icon,"금고 개방",result);
+};
+
+
+function showEvent(icon,title,result){
+
+  document.getElementById("eventIcon").textContent=icon;
+  document.getElementById("eventTitle").textContent=title;
+  document.getElementById("eventResult").textContent=result;
+
+  document.getElementById("eventModal")
+    .classList.add("show");
+}
+
+window.closeEvent=function(){
+
+  document.getElementById("eventModal")
+    .classList.remove("show");
+};
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+window.escapeGame=async function(){
+
+  if(!roomCode)return;
+
+  const score=Math.max(0,gameState.score);
+
+  vault.money+=score;
+  vault.totalEarned+=score;
+  vault.games++;
+
+  vault.xp+=Math.max(10,score);
+
+  while(vault.xp>=vault.level*100){
+    vault.xp-=vault.level*100;
+    vault.level++;
+  }
+
+  saveVault();
+
+  await update(
+    ref(db,`vaultRooms/${roomCode}/players/${playerId}`),
+    {
+      score:0,
+      bank:score,
+      active:false
+    }
+  );
+
+  gameState.active=false;
+
+  showEvent(
+    "🚪",
+    "탈출 성공",
+    `${score} 포인트를 나의 금고에 보관했습니다!`
+  );
+
+  setTimeout(()=>{
+    closeEvent();
+    showScreen("homeScreen");
+  },1200);
+};
+
+
+/* =========================================================
+   UPGRADE
+========================================================= */
+
+window.upgradeVault=function(){
+
+  const cost=vault.level*250;
+
+  if(vault.money<cost){
+    alert(`금고 업그레이드에는 ${cost}점이 필요합니다.`);
+    return;
+  }
+
+  vault.money-=cost;
+  vault.level++;
+  vault.defense++;
+
+  saveVault();
+
+  alert(
+    `🔐 금고 레벨이 ${vault.level}로 상승했습니다!`
+  );
+};
+
+
+/* =========================================================
+   ROOM UTILS
+========================================================= */
+
+window.copyRoomCode=function(){
+
+  if(!roomCode)return;
+
+  navigator.clipboard?.writeText(roomCode);
+
+  alert("방 코드가 복사되었습니다.");
+};
+
+
+window.leaveRoom=async function(){
+
+  if(roomCode){
+
+    try{
+      await remove(
+        ref(db,
+          `vaultRooms/${roomCode}/players/${playerId}`
+        )
+      );
+    }catch(e){}
+  }
+
+  roomCode=null;
+  isHost=false;
+
+  if(roomListener){
+    roomListener();
+    roomListener=null;
+  }
+
+  showScreen("roomScreen");
+};
+
+
+/* =========================================================
+   CONFIRM
+========================================================= */
+
+function confirmAction(title,text,action){
+
+  document.getElementById("confirmTitle").textContent=title;
+  document.getElementById("confirmText").textContent=text;
+
+  const btn=
+    document.getElementById("confirmButton");
+
+  btn.onclick=()=>{
+    closeConfirm();
+    action();
+  };
+
+  document.getElementById("confirmModal")
+    .classList.add("show");
+}
+
+window.closeConfirm=function(){
+  document.getElementById("confirmModal")
+    .classList.remove("show");
+};
+
+
+/* =========================================================
+   TAB VISIBILITY
+========================================================= */
+
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden){
+    updateUI();
+  }
+});
+
+</script>
+
+</body>
+</html>
+```
