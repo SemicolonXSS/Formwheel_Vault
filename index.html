@@ -876,7 +876,7 @@ function loadVault(){
 }
 
 function saveVault(){
-  localStorage.setItem(SAVE_KEY,JSON.stringify(vault));
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(vault));}catch{console.warn("개인 금고 저장 실패");}
   updateUI();
 }
 
@@ -1123,6 +1123,7 @@ window.joinRoom=async function(){
 
 
 function enterLobby(){
+  try{sessionStorage.setItem("formwheel_vault_room",roomCode);}catch{}
 
   /* 새 방에 들어갈 때마다 게임 상태 초기화 */
   gameState=freshGameState();
@@ -1315,6 +1316,14 @@ function loadGame(data){
 
   if(!me)return;
 
+  let receiptChanged=false;vault.appliedRewards=vault.appliedRewards||{};
+  for(const [key,reward] of Object.entries(me.rewards||{})){
+    if(vault.appliedRewards[key])continue;
+    vault.keys+=reward.keys||0;vault.defense+=reward.defense||0;
+    if(reward.treasure&&!vault.treasures.includes(reward.treasure))vault.treasures.push(reward.treasure);
+    vault.appliedRewards[key]=true;receiptChanged=true;
+  }
+  if(receiptChanged)saveVault();
   gameState.score=Number(me.score||0);
   gameState.bank=Number(me.bank||0);
   gameState.round=Number(data.round||1);
@@ -1428,200 +1437,33 @@ function vaultHint(type){
 let opening=false;
 
 window.openPublicVault=async function(id){
-
-  if(!roomCode || !gameState.active || opening)return;
-
-  opening=true;
-
-  try{
-
-    const code=roomCode;
-    const vaultsRef=ref(db,`vaultRooms/${code}/vaults`);
-
-    /*
-      트랜잭션으로 "내가 먼저 열었는지" 확인합니다.
-      두 명이 동시에 같은 금고를 눌러도 한 명만 성공합니다.
-    */
-    let claimed=null;
-    let allOpened=false;
-
-    const res=await runTransaction(vaultsRef,cur=>{
-
-      claimed=null;
-      allOpened=false;
-
-      if(cur===null)return cur;
-
-      const arr=
-        Array.isArray(cur)
-          ? cur.filter(Boolean)
-          : Object.values(cur);
-
-      const target=
-        arr.find(v=>Number(v.id)===Number(id));
-
-      if(!target || target.openedBy){
-        return; // 이미 열림 → 트랜잭션 취소
-      }
-
-      target.openedBy=playerId;
-      claimed={...target};
-      allOpened=arr.every(v=>!!v.openedBy);
-
-      return arr;
-    });
-
-    if(!res.committed || !claimed){
-      return;
-    }
-
-    /* 6개를 모두 열었다면 새 금고 생성 */
-    let refilled=false;
-
-    if(allOpened){
-      refilled=await refillVaults(code);
-    }
-
-    await resolveVault(claimed,refilled);
-
-  }catch(e){
-    console.error(e);
-    alert("금고를 여는 중 오류가 발생했습니다.");
-  }finally{
-    opening=false;
-  }
+ if(!roomCode||!gameState.active||opening)return;opening=true;
+ const expectedRound=gameState.round,receiptId=crypto.randomUUID(),treasure=treasureList[Math.floor(Math.random()*treasureList.length)],lucky=Math.random()<.5,newVaults=createVaults();
+ try{
+  const result=await runTransaction(ref(db,`vaultRooms/${roomCode}`),data=>{
+   const me=data?.players?.[playerId];if(!me||!me.active||data.status!=="game"||Number(data.round)!==expectedRound)return;
+   const arr=Array.isArray(data.vaults)?data.vaults.filter(Boolean):Object.values(data.vaults||{});
+   const target=arr.find(v=>Number(v.id)===Number(id));if(!target||target.openedBy)return;
+   target.openedBy=playerId;let delta=0,keys=0,defense=0,found="";
+   if(target.type==="coin"||target.type==="treasure")delta=Number(target.value)||0;
+   if(target.type==="trap")delta=-(Number(target.value)||0);
+   if(target.type==="double")delta=(Number(target.value)||0)*(lucky?2:-1);
+   if(target.type==="key")keys=1;if(target.type==="shield")defense=1;if(target.type==="treasure")found=treasure.id;
+   me.score=(Number(me.score)||0)+delta;me.rewards=me.rewards||{};
+   me.rewards[receiptId]={round:expectedRound,vaultId:Number(id),delta,keys,defense,treasure:found};
+   if(arr.every(v=>v.openedBy)){data.vaults=newVaults;data.round=expectedRound+1;}else data.vaults=arr;
+   return data;
+  },{applyLocally:false});
+  if(!result.committed)return;
+  const data=result.snapshot.val(),reward=data.players[playerId].rewards[receiptId];loadGame(data);
+  showEvent("🔐","금고 개방",`${reward.delta>=0?"+":""}${reward.delta} 포인트${reward.keys?" · 열쇠 +1":""}${reward.defense?" · 방어막 +1":""}${reward.treasure?" · 보물 발견":""}${data.round>expectedRound?" · 새 라운드 금고가 생성되었습니다.":""}`);
+ }catch(e){console.error(e);alert("금고 저장에 실패했습니다. 다시 연결하면 확정된 보상을 복구합니다.");}finally{opening=false;}
 };
-
-
-/*
-  모든 금고가 열려 있으면 새 금고 6개로 교체하고 라운드를 올립니다.
-  여러 명이 동시에 호출해도 트랜잭션 덕분에 한 번만 교체됩니다.
-*/
-async function refillVaults(code){
-
-  let didRefill=false;
-
-  const res=await runTransaction(
-    ref(db,`vaultRooms/${code}/vaults`),
-    cur=>{
-
-      didRefill=false;
-
-      if(cur===null)return cur;
-
-      const arr=
-        Array.isArray(cur)
-          ? cur.filter(Boolean)
-          : Object.values(cur);
-
-      if(!arr.every(v=>!!v.openedBy)){
-        return; // 이미 다른 사람이 교체함
-      }
-
-      didRefill=true;
-      return createVaults();
-    }
-  );
-
-  if(res.committed && didRefill){
-
-    await runTransaction(
-      ref(db,`vaultRooms/${code}/round`),
-      r=>(Number(r)||1)+1
-    );
-
-    return true;
-  }
-
-  return false;
+async function restoreVaultRoom(){
+ let code;try{code=sessionStorage.getItem("formwheel_vault_room");}catch{}if(!code)return;
+ try{const snap=await get(ref(db,"vaultRooms/"+code));const data=snap.val();if(!data?.players?.[playerId])return;roomCode=code;playerName=data.players[playerId].name;isHost=data.host===playerId;enterLobby();}catch{console.warn("금고 방 복구 실패");}
 }
-
-
-async function resolveVault(v,refilled){
-
-  let score=gameState.score;
-  let result="";
-  let icon="🔐";
-
-  if(v.type==="coin"){
-
-    score+=v.value;
-    result=`+${v.value} 포인트를 획득했습니다!`;
-    icon="💰";
-
-  }else if(v.type==="trap"){
-
-    score-=v.value;
-    result=`-${v.value} 포인트! 함정에 걸렸습니다.`;
-    icon="☠️";
-
-  }else if(v.type==="key"){
-
-    vault.keys++;
-    result="🔑 열쇠 1개를 획득했습니다!";
-    icon="🔑";
-
-  }else if(v.type==="treasure"){
-
-    score+=v.value;
-
-    const t=
-      treasureList[
-        Math.floor(Math.random()*treasureList.length)
-      ];
-
-    if(!vault.treasures.includes(t.id)){
-      vault.treasures.push(t.id);
-    }
-
-    result=
-      `+${v.value}점 + ${t.icon} ${t.name} 발견!`;
-
-    icon="💎";
-
-  }else if(v.type==="double"){
-
-    if(Math.random()<.5){
-
-      score+=v.value*2;
-      result=`🎉 성공! +${v.value*2} 포인트!`;
-      icon="🎲";
-
-    }else{
-
-      score-=v.value;
-      result=`실패! -${v.value} 포인트.`;
-      icon="💥";
-    }
-
-  }else if(v.type==="shield"){
-
-    vault.defense++;
-    result="🛡️ 금고 방어막 1개를 획득했습니다!";
-    icon="🛡️";
-  }
-
-  gameState.score=score;
-  gameState.keys=vault.keys;
-
-  await update(
-    ref(db,`vaultRooms/${roomCode}/players/${playerId}`),
-    {
-      score,
-      bank:gameState.bank,
-      active:true
-    }
-  );
-
-  saveVault();
-
-  if(refilled){
-    result+="  🔄 모든 금고가 열려 새 금고 6개가 생성되었습니다!";
-  }
-
-  showEvent(icon,"금고 개방",result);
-};
-
+restoreVaultRoom();
 
 function showEvent(icon,title,result){
 
@@ -1796,3 +1638,4 @@ document.addEventListener("visibilitychange",()=>{
 
 </body>
 </html>
+
