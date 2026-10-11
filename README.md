@@ -27,3 +27,20 @@ node scripts/check-syntax.cjs
 닉네임·답안·점수·채팅 등이 서버에 저장될 수 있습니다. 새 보안 스키마와 서버 코드는 [Formwheel/firebase-security](https://github.com/SemicolonXSS/Formwheel/tree/main/firebase-security)에 준비했습니다. 현재 운영 적용 및 기존 경로 전환이 완료되었다고 가정하지 마세요. 계정/제공자 설정, 서버 보안 검증이 필요한 항목은 Check에서 별도로 남겨둡니다.
 
 화면 마크업은 `index.html`, 앱별 스타일과 실행 코드는 `assets/`에 분리했습니다. 공통 UI는 Formwheel 저장소의 `shared/`를 사용합니다.
+
+## 🎮 게임 가이드
+
+**개인 금고** — 개인 보관과 기록 관리를 위한 Formwheel 서비스입니다.
+
+### 플레이 방법
+
+1. 금고 화면 열기
+2. 화면 안내에 따라 데이터 보관
+3. 저장된 항목 확인
+
+### 주요 기능
+
+- 개인 데이터 보관
+- 계정 연동 가능성은 실제 화면 확인 필요
+
+> 지원 모드와 버튼 이름은 배포 버전에 따라 달라질 수 있습니다.
