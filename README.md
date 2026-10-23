@@ -44,3 +44,13 @@ node scripts/check-syntax.cjs
 - 계정 연동 가능성은 실제 화면 확인 필요
 
 > 지원 모드와 버튼 이름은 배포 버전에 따라 달라질 수 있습니다.
+
+<!-- FORMWHEEL-README-2026 -->
+## 🎡 Formwheel 프로젝트 안내
+
+**Formwheel Vault** — 개인 금고 프로젝트.
+
+- [프로젝트 열기](https://semicolonxss.github.io/Formwheel_Vault/) · [Hub](https://semicolonxss.github.io/Formwheel/)
+- [개발 현황](https://semicolonxss.github.io/Formwheel_Check/) · [피드백](https://semicolonxss.github.io/Formwheel/feedback.html)
+
+프로젝트별 기능과 로그인·동기화 지원 범위는 다를 수 있습니다. 오류를 제보할 때는 재현 단계와 기기·브라우저 정보를 남겨 주세요. 비밀번호와 인증 토큰은 공유하지 마세요.
