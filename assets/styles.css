@@ -77,7 +77,7 @@ main{
   letter-spacing:-2.5px;
 }
 .hero p{
-  color:#737681;
+  color:#606571;
   margin:10px 0 0;
 }
 
@@ -105,7 +105,7 @@ main{
   font-size:21px;
 }
 .card p{
-  color:#737681;
+  color:#606571;
   margin:0;
 }
 
@@ -128,7 +128,7 @@ main{
 
 .vault-level{
   font-size:13px;
-  color:#777b85;
+  color:#626773;
   font-weight:800;
 }
 
@@ -161,7 +161,7 @@ main{
 }
 .stat span{
   font-size:12px;
-  color:#777b85;
+  color:#626773;
 }
 
 .actions{
@@ -391,4 +391,4 @@ main{
 
 .hidden{display:none!important}
 .center{text-align:center}
-.muted{color:#777b85}
+.muted{color:#626773}
